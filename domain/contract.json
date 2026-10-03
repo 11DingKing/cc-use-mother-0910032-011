@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "product": "消费者投诉证据链",
+  "source_context": "当前 GitHub 账号内通过正式容器验证的 Python 后端项目群",
+  "actors": [
+    "机构合规员",
+    "执业人员",
+    "监管人员",
+    "复核专家"
+  ],
+  "states": [
+    "登记",
+    "待核验",
+    "处置中",
+    "已决定",
+    "已归档"
+  ],
+  "invariants": [
+    "证据保全版本",
+    "重复投诉关联",
+    "案件状态约束",
+    "敏感访问审计"
+  ],
+  "sample_cases": [
+    {
+      "case_id": "0910032-011-A",
+      "actor": "机构合规员",
+      "state": "登记"
+    },
+    {
+      "case_id": "0910032-011-B",
+      "actor": "复核专家",
+      "state": "待核验"
+    }
+  ],
+  "tags": [
+    "consumer-complaint",
+    "evidence-chain"
+  ]
+}
