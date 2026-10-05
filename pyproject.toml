@@ -1,6 +1,12 @@
 [project]
 name = "domain-contract-0910032-011"
-version = "0.1.0"
-description = "消费者投诉证据链的领域约定与校验工具"
+version = "0.2.0"
+description = "消费者投诉证据链的领域约定、校验工具与后端案件系统"
 requires-python = ">=3.11"
 dependencies = []
+
+[project.scripts]
+case-system = "case_system.api:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

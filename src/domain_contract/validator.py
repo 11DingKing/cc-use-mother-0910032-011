@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 REQUIRED = {"schema_version", "product", "source_context", "actors", "states", "invariants", "sample_cases", "tags"}
+OPTIONAL_LISTS = {"actions", "evidence_channels"}
 
 
 def load_contract(path: str | Path) -> dict:
@@ -19,6 +20,9 @@ def load_contract(path: str | Path) -> dict:
     for key in ("actors", "states", "invariants", "sample_cases", "tags"):
         if not isinstance(value[key], list) or not value[key]:
             raise ValueError(f"{key} 必须是非空列表")
+    for key in OPTIONAL_LISTS:
+        if key in value and not isinstance(value[key], list):
+            raise ValueError(f"{key} 必须是列表")
     case_ids = [item.get("case_id") for item in value["sample_cases"]]
     if len(case_ids) != len(set(case_ids)):
         raise ValueError("样例编号不能重复")
@@ -31,6 +35,8 @@ def summarize(value: dict) -> dict:
         "product": value["product"],
         "actor_count": len(value["actors"]),
         "state_count": len(value["states"]),
+        "action_count": len(value.get("actions", [])),
+        "evidence_channel_count": len(value.get("evidence_channels", [])),
         "invariant_count": len(value["invariants"]),
         "case_count": len(value["sample_cases"]),
     }
