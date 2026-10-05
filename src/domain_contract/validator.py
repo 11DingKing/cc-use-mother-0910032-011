@@ -5,7 +5,17 @@ import json
 from pathlib import Path
 
 
-REQUIRED = {"schema_version", "product", "source_context", "actors", "states", "invariants", "sample_cases", "tags"}
+REQUIRED = {
+    "schema_version",
+    "product",
+    "source_context",
+    "actors",
+    "states",
+    "state_transitions",
+    "invariants",
+    "sample_cases",
+    "tags",
+}
 
 
 def load_contract(path: str | Path) -> dict:
@@ -19,6 +29,20 @@ def load_contract(path: str | Path) -> dict:
     for key in ("actors", "states", "invariants", "sample_cases", "tags"):
         if not isinstance(value[key], list) or not value[key]:
             raise ValueError(f"{key} 必须是非空列表")
+    transitions = value["state_transitions"]
+    if not isinstance(transitions, dict) or not transitions:
+        raise ValueError("state_transitions 必须是非空对象")
+    states = set(value["states"])
+    for action, rule in transitions.items():
+        sources = rule.get("from")
+        target = rule.get("to")
+        if not isinstance(sources, list) or not sources:
+            raise ValueError(f"迁移 {action} 的 from 必须是非空列表")
+        if target not in states:
+            raise ValueError(f"迁移 {action} 的目标状态 {target} 不在状态表中")
+        for source in sources:
+            if source not in states:
+                raise ValueError(f"迁移 {action} 的来源状态 {source} 不在状态表中")
     case_ids = [item.get("case_id") for item in value["sample_cases"]]
     if len(case_ids) != len(set(case_ids)):
         raise ValueError("样例编号不能重复")
@@ -31,6 +55,7 @@ def summarize(value: dict) -> dict:
         "product": value["product"],
         "actor_count": len(value["actors"]),
         "state_count": len(value["states"]),
+        "transition_count": len(value["state_transitions"]),
         "invariant_count": len(value["invariants"]),
         "case_count": len(value["sample_cases"]),
     }
